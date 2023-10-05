@@ -6,4 +6,5 @@ import math
 
 def floor(n: float) -> int:
     '''returns floor of n'''
-     return  math.floor(n)
+    floor_value:int = math.floor(n)
+    return floor_value
