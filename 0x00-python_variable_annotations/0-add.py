@@ -5,6 +5,8 @@
     Arguments: a: float
                 b: float
 '''
+
+
 def add(a: float, b: float) -> float:
     '''type-annotated function'''
     return a + b
