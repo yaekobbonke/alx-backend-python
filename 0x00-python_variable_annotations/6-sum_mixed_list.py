@@ -7,6 +7,6 @@ takes a list mxd_lst of integers and floats
 returns their sum as a float'''
 
 
-def sum_mixed_list(mxd_lst: List[Union[float, int]]) -> float:
+def sum_mixed_list(mxd_lst: List[Union[int, float]]) -> float:
     '''returns the sum of mixed integers and floats'''
     return sum(mxd_lst)
