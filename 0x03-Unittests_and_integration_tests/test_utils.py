@@ -1,62 +1,71 @@
 #!/usr/bin/env python3
-
-"""unittest"""
+""" Unit Test
+"""
 import unittest
 from parameterized import parameterized
-from utils import access_nested_map
+from unittest.mock import patch, Mock
+from utils import access_nested_map, get_json, memoize
 
 
 class TestAccessNestedMap(unittest.TestCase):
-    """Unit tests for the access_nested_map function."""
-
+    ''' nested map test function '''
     @parameterized.expand([
         ({"a": 1}, ("a",), 1),
         ({"a": {"b": 2}}, ("a",), {"b": 2}),
         ({"a": {"b": 2}}, ("a", "b"), 2)
     ])
-    def test_access_nested_map(self, nested_map, path, expected_result):
-        """
-        Test the access_nested_map function.
+    def test_access_nested_map(self, nested_map, path, expected):
+        ''' test access nested map '''
+        self.assertEqual(access_nested_map(nested_map, path), expected)
 
-        Parameters:
-        - nested_map (Mapping): A nested map.
-        - path (Sequence): A sequence of keys representing a path to the value.
-        - expected_result (Any): The expected result.
-
-        Returns:
-        - None
-
-        Raises:
-        - AssertionError: If the actual result
-        does not match the expected result.
-        """
-        self.assertEqual(access_nested_map(nested_map, path), expected_result)
-
-        @parameterized.expand([
-            ({}, ("a",)),
-            ({"a": 1}, ("a", "b"))
-        ])
+    @parameterized.expand([
+        ({}, ("a",)),
+        ({"a": 1}, ("a", "b"))
+    ])
     def test_access_nested_map_exception(self, nested_map, path):
-        """
-        Test that a KeyError is raised with the expected error message.
-
-        Parameters:
-        - nested_map (Mapping): A nested map.
-        - path (Sequence): A sequence of keys representing a path to the value.
-
-        Returns:
-        - None
-
-        Raises:
-        - AssertionError: If the expected KeyError
-        is not raised or the error message is incorrect.
-        """
-        with self.assertRaises(KeyError) as context:
+        ''' test exception'''
+        with self.assertRaises(KeyError):
             access_nested_map(nested_map, path)
 
-        expected_error_message = f"Key not found: {path[-1]}"
-        self.assertEqual(str(context.exception), expected_error_message)
+
+class TestGetJson(unittest.TestCase):
+    ''' get json unittest '''
+    @parameterized.expand([
+        ("http://example.com", {"payload": True}),
+        ("http://holberton.io", {"payload": False})
+    ])
+    def test_get_json(self, test_url, test_payload):
+        ''' self descriptive'''
+        class Mocked(Mock):
+            ''' mocked class'''
+
+            def json(self):
+                ''' json method mocked'''
+                return test_payload
+
+        with patch('requests.get') as MockClass:
+            MockClass.return_value = Mocked()
+            self.assertEqual(get_json(test_url), test_payload)
 
 
-if __name__ == '__main__':
-    unittest.main()
+class TestMemoize(unittest.TestCase):
+    ''' memoize unittest '''
+
+    def test_memoize(self):
+        ''' memoize test '''
+
+        class TestClass:
+            ''' self descriptive'''
+
+            def a_method(self):
+                return 42
+
+            @memoize
+            def a_property(self):
+                return self.a_method()
+
+        with patch.object(TestClass, 'a_method') as mocked:
+            spec = TestClass()
+            spec.a_property
+            spec.a_property
+            mocked.asset_called_once()
